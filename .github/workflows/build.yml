@@ -3,62 +3,25 @@ name: Build Android APK
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
-      # 1. Клонирование репозитория
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # 2. Установка Node.js
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-
-      # 3. Установка зависимостей
+          node-version: 18
+      
       - name: Install dependencies
-        run: npm ci
-
-      # 4. Установка Expo и EAS CLI
-      - name: Install Expo and EAS CLI
-        run: |
-          npm install -g expo-cli eas-cli
-
-      # 5. Настройка Expo
-      - name: Expo setup
-        run: |
-          expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }}
-        env:
-          EXPO_USERNAME: ${{ secrets.EXPO_USERNAME }}
-          EXPO_PASSWORD: ${{ secrets.EXPO_PASSWORD }}
-
-      # 6. Настройка EAS
-      - name: EAS setup
-        run: |
-          eas login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
-
-      # 7. Сборка APK
-      - name: Build APK with EAS
-        run: |
-          eas build --platform android --profile preview --non-interactive
-
-      # 8. Загрузка APK как артефакта
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+        run: npm install
+      
+      - name: Export Expo project
+        run: npx expo export --platform android
+      
+      - uses: actions/upload-artifact@v4
         with:
           name: fitoteka-apk
-          path: |
-            **/*.apk
-            **/dist/*.apk
-            **/build/*.apk
+          path: dist/
