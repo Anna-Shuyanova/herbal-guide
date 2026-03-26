@@ -9,6 +9,11 @@
     "android": {
       "package": "com.fitoteka.app",
       "versionCode": 1
+    },
+    "extra": {
+      "eas": {
+        "projectId": "dc291881-245b-42fe-92a1-9eed276f1a37"
+      }
     }
   }
 }
